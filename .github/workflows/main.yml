@@ -12,10 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Java 17
+    - name: Set up Java
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
+        distribution: 'zulu'
         java-version: '17'
 
     - name: Set up Flutter
@@ -23,17 +23,13 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Build Clean Flutter APK
+    - name: Build APK Cleanly
       run: |
-        mkdir -p flutter_builder
-        cd flutter_builder
-        flutter create --org com.todayearn myapp
-        cd myapp
-        cp -f ../../lib/main.dart lib/main.dart
+        flutter create . --org com.todayearn --overwrite
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: TodayEarn-APK
-        path: flutter_builder/myapp/build/app/outputs/flutter-apk/app-debug.apk
+        path: build/app/outputs/flutter-apk/app-debug.apk
