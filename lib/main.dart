@@ -41,32 +41,69 @@ class _LoginScreenState extends State<LoginScreen> {
         _isOtpSent = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('নম্বরে OTP পাঠানো হয়েছে!')),
+        const SnackBar(content: Text('নম্বরে ৬ ডিজিটের OTP পাঠানো হয়েছে! (টেস্ট কোড: 123456)')),
       );
     }
   }
 
   void _verifyOTP() {
-    if (_otpController.text.length == 6) {
+    if (_otpController.text == '123456' || _otpController.text.length == 6) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(userIdentifier: '+880 ${_phoneController.text}'),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('সঠিক ৬ ডিজিটের OTP দিন')),
+        const SnackBar(content: Text('সঠিক ৬ ডিজিটের OTP কোড দিন')),
       );
     }
   }
 
-  void _loginWithGoogle() {
-    // ফোনের সব জিমেইল দেখানোর প্রসেস
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('জিমেইল দিয়ে লগইন হচ্ছে...')),
-    );
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+  void _showGoogleAccountPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'অ্যাকাউন্ট বেছে নিন',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              ListTile(
+                leading: const CircleAvatar(child: Text('N')),
+                title: const Text('Md. Nayeem'),
+                subtitle: const Text('nayeem@gmail.com'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(userIdentifier: 'nayeem@gmail.com'),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.add_circle_outline),
+                title: const Text('অন্য অ্যাকাউন্ট যোগ করুন'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -92,7 +129,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // মোবাইল নম্বর ইনপুট ও সঠিক নম্বর চেক
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
@@ -107,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return 'মোবাইল নম্বর দিন';
                     }
                     if (value.length != 10) {
-                      return 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017xxxxxxxx)';
+                      return 'সঠিক ১০ ডিজিটের নম্বর দিন (যেমন: 17xxxxxxxx)';
                     }
                     return null;
                   },
@@ -121,14 +157,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('OTP পাঠান', style: TextStyle(fontSize: 16)),
                   ),
 
-                // OTP ইনপুট ফিল্ড
                 if (_isOtpSent) ...[
                   TextFormField(
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
                     decoration: const InputDecoration(
-                      labelText: '৬ ডিজিটের OTP কোড',
+                      labelText: '৬ ডিজিটের OTP কোড (123456)',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock_clock),
                     ),
@@ -157,9 +192,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 25),
 
-                // জিমেইল দিয়ে লগইন
                 OutlinedButton.icon(
-                  onPressed: _loginWithGoogle,
+                  onPressed: _showGoogleAccountPicker,
                   icon: const Icon(Icons.g_mobiledata, size: 30, color: Colors.red),
                   label: const Text('Google / জিমেইল দিয়ে লগইন করুন', style: TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(12)),
@@ -173,9 +207,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// হোম স্ক্রিন ও প্রোফাইল সেকশন
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String userIdentifier;
+  const HomeScreen({super.key, required this.userIdentifier});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -184,15 +218,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const Center(child: Text('মূল হোম পেজ (কাজ ও আর্নিং)', style: TextStyle(fontSize: 18))),
-    const ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      const Center(child: Text('মূল হোম পেজ (কাজ ও আর্নিং)', style: TextStyle(fontSize: 18))),
+      ProfileScreen(userIdentifier: widget.userIdentifier),
+    ];
+
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -209,26 +243,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// প্রোফাইল পেজ (নাম, পাসওয়ার্ড ও ছবি পরিবর্তন)
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String userIdentifier;
+  const ProfileScreen({super.key, required this.userIdentifier});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String userName = "মোঃ নাঈম";
-  String userPhone = "+8801700000000";
+  String userName = "মোঃ নাঈমুল ইসলাম";
 
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   void _updateProfile() {
+    _nameController.text = userName;
     showDialog(
       context: context,
       builder: (context) {
-        _nameController.text = userName;
         return AlertDialog(
           title: const Text('প্রোফাইল আপডেট করুন'),
           content: Column(
@@ -260,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('প্রোফাইল সফলভাবে আপডেট হয়েছে!')),
+                  const SnackBar(content: Text('প্রোফাইল তথ্য সফলভাবে পরিবর্তন হয়েছে!')),
                 );
               },
               child: const Text('সেভ করুন'),
@@ -286,7 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 15),
             Text(userName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text(userPhone, style: const TextStyle(color: Colors.grey)),
+            Text(widget.userIdentifier, style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 30),
             ListTile(
               leading: const Icon(Icons.edit),
