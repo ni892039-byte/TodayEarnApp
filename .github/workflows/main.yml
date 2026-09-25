@@ -23,14 +23,9 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Clean & Build APK
+    - name: Build Android Project
       run: |
-        mkdir -p /tmp/my_code
-        cp lib/main.dart /tmp/my_code/main.dart
-        rm -rf * .github
-        flutter create --org com.todayearn --project-name today_earn .
-        cp /tmp/my_code/main.dart lib/main.dart
-        cd android && ./gradlew clean && cd ..
+        flutter create --org com.todayearn --platforms android .
         flutter pub get
         flutter build apk --debug --no-tree-shake-icons
 
