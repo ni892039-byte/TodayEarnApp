@@ -12,32 +12,29 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Java
+    - name: Set up Java 11
       uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
-        java-version: '17'
+        distribution: 'temurin'
+        java-version: '11'
 
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.16.9'
         channel: 'stable'
 
-    - name: Build Custom App APK
+    - name: Clean & Prepare Project
       run: |
-        # ১. অরিজিনাল main.dart এর সেফ ব্যাকআপ নেওয়া
         mkdir -p /tmp/app_code
         cp lib/main.dart /tmp/app_code/main.dart
-        
-        # ২. পুরো ডিরেক্টরি ক্লিন করে ফ্রেশ অ্যাপ স্ট্রাকচার বানানো
         rm -rf * .github
         flutter create --org com.todayearn --project-name today_earn .
-        
-        # ৩. ব্যাকআপ নেওয়া আসল কোডটি ফিরিয়ে আনা
         cp /tmp/app_code/main.dart lib/main.dart
-        
-        # ৪. ডিপেনডেন্সি চেক ও ক্লিন ডেবাগ বিল্ড
         flutter pub get
+
+    - name: Build Debug APK
+      run: |
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
