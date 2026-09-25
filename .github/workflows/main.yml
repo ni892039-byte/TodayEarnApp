@@ -23,14 +23,12 @@ jobs:
       with:
         flutter-version: '3.19.x'
 
-    - name: Create complete Flutter structure
+    - name: Build App Cleanly
       run: |
-        mkdir temp_app
-        cd temp_app
-        flutter create --org com.todayearn .
-        cp -r ../lib/* ./lib/ 2>/dev/null || true
-        cp ../pubspec.yaml ./pubspec.yaml 2>/dev/null || true
-        flutter pub get
+        rm -rf app_build
+        flutter create --org com.todayearn app_build
+        cp lib/main.dart app_build/lib/main.dart
+        cd app_build
         flutter build apk --release
         cp build/app/outputs/flutter-apk/app-release.apk ../app-release.apk
 
