@@ -23,14 +23,19 @@ jobs:
       with:
         flutter-version: '3.19.x'
 
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Build APK
-      run: flutter build apk --release
+    - name: Create complete Flutter structure
+      run: |
+        mkdir temp_app
+        cd temp_app
+        flutter create --org com.todayearn .
+        cp -r ../lib/* ./lib/ 2>/dev/null || true
+        cp ../pubspec.yaml ./pubspec.yaml 2>/dev/null || true
+        flutter pub get
+        flutter build apk --release
+        cp build/app/outputs/flutter-apk/app-release.apk ../app-release.apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: TodayEarn-APK
-        path: build/app/outputs/flutter-apk/app-release.apk
+        path: app-release.apk
