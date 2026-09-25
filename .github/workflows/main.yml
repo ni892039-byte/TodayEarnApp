@@ -23,16 +23,10 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Generate Project Files Safely
+    - name: Build Debug APK
       run: |
-        mkdir -p /tmp/backup_lib
-        cp -rf lib/* /tmp/backup_lib/
         flutter create --org com.todayearn --project-name today_earn .
-        cp -rf /tmp/backup_lib/* lib/
         flutter pub get
-
-    - name: Build APK File
-      run: |
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
