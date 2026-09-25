@@ -23,9 +23,12 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Build APK Cleanly
+    - name: Prepare Clean Flutter Project
       run: |
+        mkdir temp_src
+        cp -f lib/main.dart temp_src/main.dart
         flutter create . --org com.todayearn --overwrite
+        cp -f temp_src/main.dart lib/main.dart
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
