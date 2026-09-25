@@ -23,12 +23,21 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Build App with Custom Code
+    - name: Build Custom App APK
       run: |
-        mkdir -p backup
-        cp -f lib/main.dart backup/main.dart
-        flutter create . --org com.todayearn --overwrite
-        cp -f backup/main.dart lib/main.dart
+        # ১. অরিজিনাল main.dart এর সেফ ব্যাকআপ নেওয়া
+        mkdir -p /tmp/app_code
+        cp lib/main.dart /tmp/app_code/main.dart
+        
+        # ২. পুরো ডিরেক্টরি ক্লিন করে ফ্রেশ অ্যাপ স্ট্রাকচার বানানো
+        rm -rf * .github
+        flutter create --org com.todayearn --project-name today_earn .
+        
+        # ৩. ব্যাকআপ নেওয়া আসল কোডটি ফিরিয়ে আনা
+        cp /tmp/app_code/main.dart lib/main.dart
+        
+        # ৪. ডিপেনডেন্সি চেক ও ক্লিন ডেবাগ বিল্ড
+        flutter pub get
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
