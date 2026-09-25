@@ -13,7 +13,7 @@ class TodayEarnApp extends StatelessWidget {
       title: 'Today Earn',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
       home: const LoginScreen(),
