@@ -265,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return AlertDialog(
           title: const Text('প্রোফাইল আপডেট করুন'),
           content: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MyAxisSize.min,
             children: [
               TextField(
                 controller: _nameController,
