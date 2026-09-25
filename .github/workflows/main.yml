@@ -23,16 +23,14 @@ jobs:
       with:
         flutter-version: '3.19.x'
 
-    - name: Create and Build Flutter App
+    - name: Create Clean Project & Build Debug APK
       run: |
         rm -rf temp_app
-        flutter create --template=app --org com.todayearn temp_app
+        flutter create temp_app
         cp -f lib/main.dart temp_app/lib/main.dart
         cd temp_app
-        chmod +x android/gradlew
-        flutter pub get
-        flutter build apk --release --no-tree-shake-icons
-        cp build/app/outputs/flutter-apk/app-release.apk ../app-release.apk
+        flutter build apk --debug
+        cp build/app/outputs/flutter-apk/app-debug.apk ../app-release.apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
