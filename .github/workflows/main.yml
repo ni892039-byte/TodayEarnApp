@@ -23,13 +23,15 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Re-generate Flutter Android Scaffold
+    - name: Clean & Build APK
       run: |
-        flutter create --org com.todayearn --platforms=android .
+        mkdir -p /tmp/my_code
+        cp lib/main.dart /tmp/my_code/main.dart
+        rm -rf * .github
+        flutter create --org com.todayearn --project-name today_earn .
+        cp /tmp/my_code/main.dart lib/main.dart
+        cd android && ./gradlew clean && cd ..
         flutter pub get
-
-    - name: Build Debug APK
-      run: |
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
