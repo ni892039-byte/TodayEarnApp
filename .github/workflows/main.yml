@@ -23,12 +23,12 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Prepare Clean Flutter Project
+    - name: Build App with Custom Code
       run: |
-        mkdir temp_src
-        cp -f lib/main.dart temp_src/main.dart
+        mkdir -p backup
+        cp -f lib/main.dart backup/main.dart
         flutter create . --org com.todayearn --overwrite
-        cp -f temp_src/main.dart lib/main.dart
+        cp -f backup/main.dart lib/main.dart
         flutter build apk --debug --no-tree-shake-icons
 
     - name: Upload APK Artifact
